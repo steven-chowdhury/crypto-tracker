@@ -8,11 +8,43 @@
 
   display: grid;
   grid-template-rows: 20px 1fr 20px;
-  align-items: center;
+  align-items: top;
   justify-items: center;
-  min-height: 100svh;
   padding: 80px;
   gap: 64px;
   font-family: var(--font-geist-sans);
+}
+
+.table {
+  border: 1px solid white;
+
+  td, th {
+    padding: 10px;
+    border-left: 1px solid white;
+    padding: 10px;
+
+    &:first-child {
+      border-left: 0;
+    }
+  }
+
+  th {
+    border-bottom: 1px solid white;
+  }
+
+  /* td, th {
+    padding: 10px;
+    border-left: 1px solid white;
+    border-bottom: 1px solid white;
+
+    &:first-child {
+      border-left: 0;
+    }
+
+    &:last-child {
+      border-right: 1px solid white;
+    }
+
+  } */
 }
 
