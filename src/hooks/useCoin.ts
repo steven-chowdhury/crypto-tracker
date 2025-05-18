@@ -1,15 +1,7 @@
 import { useState, useEffect } from 'react'
 
 const useCoin = (symbol: string) => {
-  const [ coin, setCoin ] = useState<Coin>({
-    high: 0.00,
-    low: 0.00,
-    volume: 0.00,
-    symbol,
-    bid: 0.00,
-    ask: 0.00,
-    price: 0,
-  })
+  const [ coin, setCoin ] = useState<Coin | null>(null)
 
   const [ loading, setLoading ] = useState<boolean>(false)
 
