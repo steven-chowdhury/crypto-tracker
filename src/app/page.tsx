@@ -4,7 +4,15 @@ import styles from "./page.module.css";
 import useCoin from '@/hooks/useCoin';
 
 export default function Home() {
-  const { coin } = useCoin('ETHUSDT')
+  const { coin, loading, error } = useCoin('ETHUSDT')
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error tracking coin: {coin.symbol}</div>
+  }
 
   return (
     <div className={styles.page}>

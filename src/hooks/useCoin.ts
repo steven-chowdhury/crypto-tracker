@@ -11,8 +11,13 @@ const useCoin = (symbol: string) => {
     price: 0,
   })
 
+  const [ loading, setLoading ] = useState<boolean>(false)
+
+  const [ error, setError ] = useState<Error | null>(null)
+
   useEffect(() => {
-    const socket = new WebSocket('wss://stream.binance.us:9443/ws/btcusdt@ticker')
+    const symbolLower = symbol.toLowerCase()
+    const socket = new WebSocket(`wss://stream.binance.us:9443/ws/${symbolLower}@ticker`)
 
     socket.addEventListener('message', (e) => {
       const data = JSON.parse(e.data)
@@ -32,12 +37,15 @@ const useCoin = (symbol: string) => {
       setCoin(coin)
     })
 
+    setLoading(true)
+
     socket.addEventListener('open', (e) => {
-      console.log('socket open')
+      setLoading(false)
     })
 
     socket.addEventListener('error', (e) => {
-      console.log('Error opening websocket', e)
+      setLoading(false)
+      setError(new Error(`Error opening websocket for coin: ${symbol}`))
     })
 
     return () => socket.close()
@@ -48,7 +56,9 @@ const useCoin = (symbol: string) => {
   }
 
   return {
-    coin
+    coin,
+    loading,
+    error
   }
 }
 
