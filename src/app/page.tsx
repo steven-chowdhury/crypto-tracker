@@ -3,26 +3,14 @@
 import { useEffect, useState } from 'react';
 import styles from "./page.module.css";
 
-interface Coin {
-  c: string // price
-  h: string // high
-  l: string // low
-  v: string // volume
-  s: string // ticker symbol,
-  b: string // bid,
-  a: string // ask
-  price: number
-}
-
 export default function Home() {
-  const [ data, setData ] = useState<Coin>({
-    c: '0',
-    h: '0',
-    l: '0',
-    v: '0',
-    s: '',
-    b: '',
-    a: '',
+  const [ coin, setCoin ] = useState<Coin>({
+    high: 0.00,
+    low: 0.00,
+    volume: 0.00,
+    symbol: '',
+    bid: 0.00,
+    ask: 0.00,
     price: 0,
   })
 
@@ -30,15 +18,21 @@ export default function Home() {
     const socket = new WebSocket('wss://stream.binance.us:9443/ws/btcusdt@ticker')
 
     socket.addEventListener('message', (e) => {
-      console.log('event.data =>', e.data)
-
       const data = JSON.parse(e.data)
 
-      const coin = Object.assign({}, data, {
-        price: calcPrice(data.b, data.a)
-      })
+      const price = (parseFloat(data.a) + parseFloat(data.b)) / 2
 
-      setData(coin)
+      const coin: Coin = {
+        high: formatPrice(data.h),
+        low: formatPrice(data.l),
+        volume: parseFloat(data.v),
+        symbol: data.s,
+        bid: formatPrice(data.b),
+        ask: formatPrice(data.a),
+        price: formatPrice(price)
+      }
+
+      setCoin(coin)
     })
 
     socket.addEventListener('open', (e) => {
@@ -52,13 +46,8 @@ export default function Home() {
     return () => socket.close()
   }, [])
 
-  const formatPrice = (price: string): string => {
-    return Number(price).toFixed(2)
-  }
-
-  const calcPrice = (bid: string, ask: string): string => {
-    const price = (Number(bid) + Number(ask)) / 2
-    return formatPrice(`${price}`)
+  const formatPrice = (price: number): number => {
+    return parseFloat(Number(price).toFixed(2))
   }
 
   return (
@@ -76,11 +65,11 @@ export default function Home() {
         </thead>
         <tbody>
           <tr>
-            <td>{data.s}</td>
-            <td>{data.price}</td>
-            <td>{formatPrice(data.h)}</td>
-            <td>{formatPrice(data.l)}</td>
-            <td>{formatPrice(data.v)}</td>
+            <td>{coin.symbol}</td>
+            <td>{coin.price.toLocaleString()}</td>
+            <td>{coin.high.toLocaleString()}</td>
+            <td>{coin.low.toLocaleString()}</td>
+            <td>{coin.volume.toLocaleString()}</td>
           </tr>
         </tbody>
       </table>
