@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react'
 
 const useCoin = (symbol: string) => {
   const [ coin, setCoin ] = useState<Coin | null>(null)
-
   const [ loading, setLoading ] = useState<boolean>(false)
-
   const [ error, setError ] = useState<Error | null>(null)
 
   useEffect(() => {
@@ -13,6 +11,8 @@ const useCoin = (symbol: string) => {
 
     socket.addEventListener('message', (e) => {
       const data = JSON.parse(e.data)
+
+      console.log(data)
 
       const price = (parseFloat(data.a) + parseFloat(data.b)) / 2
 
@@ -37,14 +37,18 @@ const useCoin = (symbol: string) => {
 
     socket.addEventListener('error', (e) => {
       setLoading(false)
-      setError(new Error(`Error opening websocket for coin: ${symbol}`))
+      setError(new Error(`Socket error: ${e}`))
+    })
+
+    socket.addEventListener('close', (e) => {
+      console.log('Socket disconnected')
     })
 
     return () => socket.close()
   }, [])
 
   const formatPrice = (price: number): number => {
-    return parseFloat(Number(price).toFixed(2))
+    return Number(Number(price).toFixed(2))
   }
 
   return {
