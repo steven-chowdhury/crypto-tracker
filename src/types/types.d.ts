@@ -6,4 +6,5 @@ interface Coin {
   bid: number // bid,
   ask: number // ask
   price: number
+  timestamp: number
 }

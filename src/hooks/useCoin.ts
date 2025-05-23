@@ -23,7 +23,8 @@ const useCoin = (symbol: string) => {
         symbol,
         bid: formatPrice(data.b),
         ask: formatPrice(data.a),
-        price: formatPrice(price)
+        price: formatPrice(price),
+        timestamp: data.E
       }
 
       setCoin(coin)

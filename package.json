@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "ag-charts-react": "^11.3.0",
     "ag-grid-react": "^33.3.0",
     "next": "15.3.2",
     "react": "^19.0.0",

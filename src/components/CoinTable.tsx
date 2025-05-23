@@ -36,7 +36,7 @@ const CoinTable = ({ coin }: CoinTableProps) => {
   ]
 
   return (
-    <div style={{ width: '100%'}}>
+    <div className={styles.coinTable}>
       <AgGridReact
         domLayout='autoHeight'
         theme={darkTheme}

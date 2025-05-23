@@ -3,6 +3,7 @@
 import CoinTable from '@/components/CoinTable'
 import styles from './page.module.css'
 import useCoin from '@/hooks/useCoin'
+import Graph from '@/components/Graph'
 
 export default function Home() {
   const symbol = 'ETHUSDT'
@@ -13,7 +14,10 @@ export default function Home() {
       <h1>Crypto Tracker</h1>
       {loading && <div>Loading...</div>}
       {error && <div>Error tracking coin: {symbol}</div>}
-      {coin && <CoinTable coin={coin} />}
+      <div className={styles.container}>
+        {coin && <Graph coin={coin}/>}
+        {coin && <CoinTable coin={coin} />}
+      </div>
     </div>
   );
 }
