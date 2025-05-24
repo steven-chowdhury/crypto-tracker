@@ -9,18 +9,14 @@ interface GraphProps {
 
 interface IData {
   price: number
-  timestamp: number
+  timestamp: string
 }
 
 const theme = 'ag-material-dark'
 
 const Graph = ({ coin }: GraphProps) => {
-  console.log('coin =>', coin)
   const [options, setOptions] = useState<AgChartOptions>({
-    data: [{
-      price: coin.price,
-      timestamp: coin.timestamp
-    }] as IData[],
+    data: [] as IData[],
     series: [{ 
       type: 'line', 
       xKey: 'timestamp', 
@@ -30,32 +26,31 @@ const Graph = ({ coin }: GraphProps) => {
   })
 
   useEffect(() => {
-    let newData = []
+    const fetchData = async () => {
+      const symbol = coin.symbol
+      const interval = '1h'
+      const url = `https://api.binance.us/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=24`
+      
+      const res = await fetch(url)
+      const json = await res.json()
 
-    if (!options.data) {
-      return
-    }
+      const data = json.map(item => ({ 
+        timestamp: new Date(item[0]).toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          hour12: true,
+        }),
+        price: parseFloat(item[4])
+      }))
 
-    if (options.data.length >= 5) {
-      newData = options.data.slice(1)
-      newData.push({
-        price: coin.price,
-        timestamp: coin.timestamp
+      setOptions({
+        data: data,
+        series: [{ type: 'line', xKey: 'timestamp', yKey: 'price'}],
+        theme
       })
-    } else {
-      newData = options.data.concat([{
-        price: coin.price,
-        timestamp: coin.timestamp
-      }])
     }
 
-    setOptions({
-      data: newData,
-      series: [{ type: 'line', xKey: 'timestamp', yKey: 'price'}],
-      theme
-    })
-    console.log('options =>', options)
-  }, [coin])
+    fetchData()
+  }, [coin.symbol])
 
   return (
     <div className={styles.graph}>

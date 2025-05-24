@@ -12,8 +12,6 @@ const useCoin = (symbol: string) => {
     socket.addEventListener('message', (e) => {
       const data = JSON.parse(e.data)
 
-      console.log(data)
-
       const price = (parseFloat(data.a) + parseFloat(data.b)) / 2
 
       const coin: Coin = {
