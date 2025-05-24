@@ -30,11 +30,11 @@ const Graph = ({ coin }: GraphProps) => {
       const symbol = coin.symbol
       const interval = '1h'
       const url = `https://api.binance.us/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=24`
-      
+
       const res = await fetch(url)
       const json = await res.json()
 
-      const data = json.map(item => ({ 
+      const data = json.map((item: Array<any>) => ({ 
         timestamp: new Date(item[0]).toLocaleTimeString('en-US', {
           hour: 'numeric',
           hour12: true,
