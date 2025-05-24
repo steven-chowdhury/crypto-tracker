@@ -28,8 +28,16 @@ const Graph = ({ coin }: GraphProps) => {
   useEffect(() => {
     const fetchData = async () => {
       const symbol = coin.symbol
-      const interval = '1h'
-      const url = `https://api.binance.us/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=24`
+      const interval = '5m'
+      const now = new Date(); 
+
+      const startTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+      ).getTime()
+
+      const url = `https://api.binance.us/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${startTime}`
 
       const res = await fetch(url)
       const json = await res.json()
@@ -37,6 +45,7 @@ const Graph = ({ coin }: GraphProps) => {
       const data = json.map((item: Array<any>) => ({ 
         timestamp: new Date(item[0]).toLocaleTimeString('en-US', {
           hour: 'numeric',
+          minute: '2-digit',
           hour12: true,
         }),
         price: parseFloat(item[4])
