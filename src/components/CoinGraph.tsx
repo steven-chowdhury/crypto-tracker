@@ -30,8 +30,6 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
     const interval = '5m'
     const now = new Date();
     
-    console.log('fetching data')
-
     const startTime = new Date(
       now.getFullYear(),
       now.getMonth(),
