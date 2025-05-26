@@ -25,40 +25,47 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
     theme
   })
 
+  const fetchData = async () => {
+    const symbol = coin.symbol
+    const interval = '5m'
+    const now = new Date();
+    
+    console.log('fetching data')
+
+    const startTime = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    ).getTime()
+
+    const url = `https://api.binance.us/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${startTime}`
+
+    const res = await fetch(url)
+    const json = await res.json()
+
+    const data = json.map((item: Array<any>) => ({ 
+      timestamp: new Date(item[0]).toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      }),
+      price: parseFloat(item[4])
+    }))
+
+    setOptions({
+      data: data,
+      series: [{ type: 'line', xKey: 'timestamp', yKey: 'price'}],
+      theme
+    })
+  }
+
   useEffect(() => {
-    const fetchData = async () => {
-      const symbol = coin.symbol
-      const interval = '5m'
-      const now = new Date(); 
-
-      const startTime = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-      ).getTime()
-
-      const url = `https://api.binance.us/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${startTime}`
-
-      const res = await fetch(url)
-      const json = await res.json()
-
-      const data = json.map((item: Array<any>) => ({ 
-        timestamp: new Date(item[0]).toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        }),
-        price: parseFloat(item[4])
-      }))
-
-      setOptions({
-        data: data,
-        series: [{ type: 'line', xKey: 'timestamp', yKey: 'price'}],
-        theme
-      })
-    }
-
     fetchData()
+
+    // fetch data every 5min
+    const fetchInterval = window.setInterval(fetchData, 300000)
+
+    return () => window.clearInterval(fetchInterval)
   }, [coin.symbol])
 
   return (
