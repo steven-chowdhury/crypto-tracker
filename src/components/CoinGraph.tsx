@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import styles from './Graph.module.css'
+import styles from './CoinGraph.module.css'
 import { AgCharts } from 'ag-charts-react'
 import { AgChartOptions, AgLineSeriesOptions } from 'ag-charts-community'
 
-interface GraphProps {
+interface CoinGraphProps {
   coin: Coin
 }
 
@@ -14,7 +14,7 @@ interface IData {
 
 const theme = 'ag-material-dark'
 
-const Graph = ({ coin }: GraphProps) => {
+const CoinGraph = ({ coin }: CoinGraphProps) => {
   const [options, setOptions] = useState<AgChartOptions>({
     data: [] as IData[],
     series: [{ 
@@ -70,4 +70,4 @@ const Graph = ({ coin }: GraphProps) => {
   )
 }
 
-export default Graph
+export default CoinGraph
