@@ -1,10 +1,15 @@
 interface Coin {
-  high: number // high
-  low: number // low
-  volume: number // volume
+  high: number 
+  low: number
+  volume: number
   symbol: string // ticker symbol,
-  bid: number // bid,
-  ask: number // ask
+  bid: number
+  ask: number
   price: number
   timestamp: number
+}
+
+interface IData {
+  price: number | null
+  timestamp: string
 }

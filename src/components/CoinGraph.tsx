@@ -1,65 +1,19 @@
 import { useEffect, useState } from 'react'
 import styles from './CoinGraph.module.css'
 import { AgCharts } from 'ag-charts-react'
-import { AgChartOptions, AgLineSeriesOptions } from 'ag-charts-community'
+import { AgChartOptions } from 'ag-charts-community'
+import { getInitialGraphData } from '@/utils/graphUtil'
 
 interface CoinGraphProps {
   coin: Coin
 }
 
-interface IData {
-  price: number
-  timestamp: string
-}
-
-const theme = 'ag-material-dark'
+const initialData = getInitialGraphData()
 
 const CoinGraph = ({ coin }: CoinGraphProps) => {
-  const [options, setOptions] = useState<AgChartOptions>({
-    data: [] as IData[],
-    series: [{ 
-      type: 'line', 
-      xKey: 'timestamp', 
-      yKey: 'price'
-    }] as AgLineSeriesOptions[],
-    theme
-  })
-
-  const getInitialCandleSticks = () => {
-    // Get five min/full day in milliseconds
-    const fiveMin = 60 * 5 * 1000
-    const fullDay = 60 * 60 * 24 * 1000
-
-    const numFiveMin = fullDay / fiveMin
-
-    const now = new Date();
-    
-    const startTime = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    ).getTime()
-
-    const candleSticks = []
-
-    for (let i=0; i<=numFiveMin; i++) {
-      const candleStick = { 
-        timestamp: new Date(startTime + (i * fiveMin)).toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        }),
-        price: null
-      }
-      candleSticks.push(candleStick)
-    }
-
-    return candleSticks
-  }
+  const [options, setOptions] = useState<AgChartOptions>(initialData)
 
   const fetchData = async () => {
-    const initialCandleSticks = getInitialCandleSticks()
-
     const symbol = coin.symbol
     const interval = '5m'
     const now = new Date();
@@ -75,17 +29,11 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
     const res = await fetch(url)
     const json = await res.json()
 
-    const data = json.map((item: Array<any>) => ({ 
-      timestamp: new Date(item[0]).toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      }),
-      price: parseFloat(item[4])
-    }))
-
-    const candleSticks = initialCandleSticks.map((point, idx) => {
-      const price = data[idx]?.price || point.price
+    const data = initialData.data?.map((point, idx): IData => {
+      const price = json[idx]
+        ? parseFloat(json[idx][4])
+        : null
+      
       const timestamp = point.timestamp
 
       return {
@@ -94,11 +42,11 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
       }
     })
 
-    setOptions({
-      data: candleSticks,
-      series: [{ type: 'line', xKey: 'timestamp', yKey: 'price'}],
-      theme
+    const newData = Object.assign({}, options, {
+      data: data || []
     })
+
+    setOptions(newData)
   }
 
   useEffect(() => {
