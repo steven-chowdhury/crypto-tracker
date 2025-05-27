@@ -25,7 +25,41 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
     theme
   })
 
+  const getInitialCandleSticks = () => {
+    // Get five min/full day in milliseconds
+    const fiveMin = 60 * 5 * 1000
+    const fullDay = 60 * 60 * 24 * 1000
+
+    const numFiveMin = fullDay / fiveMin
+
+    const now = new Date();
+    
+    const startTime = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    ).getTime()
+
+    const candleSticks = []
+
+    for (let i=0; i<=numFiveMin; i++) {
+      const candleStick = { 
+        timestamp: new Date(startTime + (i * fiveMin)).toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        }),
+        price: null
+      }
+      candleSticks.push(candleStick)
+    }
+
+    return candleSticks
+  }
+
   const fetchData = async () => {
+    const initialCandleSticks = getInitialCandleSticks()
+
     const symbol = coin.symbol
     const interval = '5m'
     const now = new Date();
@@ -50,14 +84,25 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
       price: parseFloat(item[4])
     }))
 
+    const candleSticks = initialCandleSticks.map((point, idx) => {
+      const price = data[idx]?.price || point.price
+      const timestamp = point.timestamp
+
+      return {
+        price,
+        timestamp
+      }
+    })
+
     setOptions({
-      data: data,
+      data: candleSticks,
       series: [{ type: 'line', xKey: 'timestamp', yKey: 'price'}],
       theme
     })
   }
 
   useEffect(() => {
+    // fetch initial data
     fetchData()
 
     // fetch data every 5min
