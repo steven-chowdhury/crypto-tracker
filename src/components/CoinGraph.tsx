@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import styles from './CoinGraph.module.css'
 import { AgCharts } from 'ag-charts-react'
-import { AgChartOptions } from 'ag-charts-community'
+import { AgChartOptions, AgLineSeriesOptions } from 'ag-charts-community'
 import { getInitialGraphData } from '@/utils/graphUtil'
 
 interface CoinGraphProps {
@@ -48,6 +48,37 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
 
     setOptions(newData)
   }
+
+  useEffect(() => {
+    if (!options.data) {
+      return
+    }
+
+    const lastIdx = options.data.findLastIndex(item => !!item.price)
+
+    const newData = options.data.map((item, idx) => {
+      if (idx === lastIdx) {
+        return {
+          price: coin.price,
+          timestamp: new Date().toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          })
+        }
+      }
+
+      return item
+    })
+
+    const newOptions: AgChartOptions = {
+      theme: options.theme,
+      data: newData,
+      series: options.series as AgLineSeriesOptions[]
+    }
+
+    setOptions(newOptions)
+  }, [coin])
 
   useEffect(() => {
     // fetch initial data
