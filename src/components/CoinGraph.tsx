@@ -11,7 +11,17 @@ interface CoinGraphProps {
 const initialData = getInitialGraphData()
 
 const CoinGraph = ({ coin }: CoinGraphProps) => {
-  const [options, setOptions] = useState<AgChartOptions>(initialData)
+  const [data, setData] = useState<IData[]>(initialData)
+
+  const graphOptions: AgChartOptions = {
+    theme: 'ag-material-dark',
+    data: data,
+    series: [{ 
+      type: 'line', 
+      xKey: 'timestamp', 
+      yKey: 'price'
+    }] as AgLineSeriesOptions[]
+  }
 
   const fetchData = async () => {
     const symbol = coin.symbol
@@ -29,7 +39,7 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
     const res = await fetch(url)
     const json = await res.json()
 
-    const data = initialData.data?.map((point, idx): IData => {
+    const newData = data.map((point, idx): IData => {
       const price = json[idx]
         ? parseFloat(json[idx][4])
         : null
@@ -42,21 +52,13 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
       }
     })
 
-    const newData = Object.assign({}, options, {
-      data: data || []
-    })
-
-    setOptions(newData)
+    setData(newData)
   }
 
   useEffect(() => {
-    if (!options.data) {
-      return
-    }
+    const lastIdx = data.findLastIndex(item => !!item.price)
 
-    const lastIdx = options.data.findLastIndex(item => !!item.price)
-
-    const newData = options.data.map((item, idx) => {
+    const newData = data.map((item, idx) => {
       if (idx === lastIdx) {
         return {
           price: coin.price,
@@ -71,13 +73,7 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
       return item
     })
 
-    const newOptions: AgChartOptions = {
-      theme: options.theme,
-      data: newData,
-      series: options.series as AgLineSeriesOptions[]
-    }
-
-    setOptions(newOptions)
+    setData(newData)
   }, [coin])
 
   useEffect(() => {
@@ -93,7 +89,7 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
   return (
     <div className={styles.graph}>
       <AgCharts
-        options={options}
+        options={graphOptions}
       />
     </div>
   )

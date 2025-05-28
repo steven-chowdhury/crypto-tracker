@@ -1,8 +1,4 @@
-import { AgChartOptions, AgLineSeriesOptions } from 'ag-charts-community'
-
-const THEME = 'ag-material-dark'
-
-export const getInitialGraphData = () => {
+export const getInitialGraphData = (): IData[] => {
   // Get five min/full day in milliseconds
   const fiveMin = 60 * 5 * 1000
   const fullDay = 60 * 60 * 24 * 1000
@@ -31,13 +27,5 @@ export const getInitialGraphData = () => {
     candleSticks.push(candleStick)
   }
 
-  return {
-    data: candleSticks,
-    series: [{ 
-      type: 'line', 
-      xKey: 'timestamp', 
-      yKey: 'price'
-    }] as AgLineSeriesOptions[],
-    theme: THEME
-  } as AgChartOptions
+  return candleSticks
 }
