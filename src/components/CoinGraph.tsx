@@ -88,6 +88,7 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
 
   return (
     <div className={styles.graph}>
+      <h3>{coin.symbol}</h3>
       <AgCharts
         options={graphOptions}
       />

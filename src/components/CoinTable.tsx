@@ -1,13 +1,15 @@
 import styles from './CoinTable.module.css'
 import { AllCommunityModule, ColDef, ModuleRegistry, colorSchemeDark, themeQuartz } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
+import { useRef, useState } from 'react'
 
 ModuleRegistry.registerModules([AllCommunityModule])
 
 const darkTheme = themeQuartz.withPart(colorSchemeDark)
 
 interface CoinTableProps {
-  coin: Coin
+  coins: Coin[]
+  onRowSelect: (rowIdx: number) => void
 }
 
 interface IRow {
@@ -18,14 +20,16 @@ interface IRow {
   volume: string
 }
 
-const CoinTable = ({ coin }: CoinTableProps) => {
-  const rowData: IRow[] = [{
+const CoinTable = ({ coins, onRowSelect }: CoinTableProps) => {
+  const gridRef = useRef(null)
+
+  const rowData: IRow[] = coins.map(coin => ({
     name: coin.symbol,
     price: coin.price.toLocaleString(),
     high: coin.high.toLocaleString(),
     low: coin.low.toLocaleString(),
     volume: coin.volume.toLocaleString()
-  }]
+  }))
 
   const colDefs: ColDef<IRow>[] = [
     { field: 'name', flex: 1 },
@@ -35,13 +39,22 @@ const CoinTable = ({ coin }: CoinTableProps) => {
     { field: 'volume', flex: 1 },
   ]
 
+  const handleRowClick = (row: any) => {
+    onRowSelect(row.rowIndex)
+  }
+
   return (
     <div className={styles.coinTable}>
       <AgGridReact
+        ref={gridRef}
         domLayout='autoHeight'
         theme={darkTheme}
         rowData={rowData}
+        rowSelection='single'
         columnDefs={colDefs}
+        onRowClicked={handleRowClick}
+        rowClass={styles.coinRow}
+        suppressCellFocus
       />
     </div>
   )
