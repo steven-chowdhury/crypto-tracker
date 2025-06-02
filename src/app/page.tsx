@@ -10,7 +10,7 @@ const symbols = ['BTCUSDT', 'ETHUSDT', 'DOGEUSDT']
 
 export default function Home() {
   
-  const { coins, loading, error } = useCoins(symbols)
+  const { coins, loading } = useCoins(symbols)
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   const handleRowSelect = (rowIdx: number) => {
@@ -21,7 +21,6 @@ export default function Home() {
     <div className={styles.page}>
       <h1>Crypto Tracker</h1>
       {loading && <div>Loading...</div>}
-      {/* {error && <div>Error tracking coin: {symbol}</div>} */}
       <div className={styles.container}>
         <CoinGraph coin={coins[selectedIndex]} />
         <CoinTable coins={coins} onRowSelect={handleRowSelect} />

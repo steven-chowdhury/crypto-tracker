@@ -1,7 +1,8 @@
 import styles from './CoinTable.module.css'
-import { AllCommunityModule, ColDef, ModuleRegistry, colorSchemeDark, themeQuartz } from 'ag-grid-community'
+import { AllCommunityModule, ColDef, ModuleRegistry, 
+  colorSchemeDark, themeQuartz, RowClickedEvent } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 
 ModuleRegistry.registerModules([AllCommunityModule])
 
@@ -39,8 +40,9 @@ const CoinTable = ({ coins, onRowSelect }: CoinTableProps) => {
     { field: 'volume', flex: 1 },
   ]
 
-  const handleRowClick = (row: any) => {
-    onRowSelect(row.rowIndex)
+  const handleRowClick = (e: RowClickedEvent<IRow, any>) => {
+    const idx = e.rowIndex || 0
+    onRowSelect(idx)
   }
 
   return (

@@ -56,7 +56,7 @@ const useCoins = (symbols: string[]) => {
 
     setLoading(true)
 
-    socket.addEventListener('open', (e) => {
+    socket.addEventListener('open', () => {
       setLoading(false)
     })
 
@@ -65,7 +65,7 @@ const useCoins = (symbols: string[]) => {
       setError(new Error(`Socket error: ${e}`))
     })
 
-    socket.addEventListener('close', (e) => {
+    socket.addEventListener('close', () => {
       console.log('Socket disconnected')
     })
 
