@@ -19,8 +19,29 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
     series: [{ 
       type: 'line', 
       xKey: 'timestamp', 
-      yKey: 'price'
-    }] as AgLineSeriesOptions[]
+      yKey: 'price',
+    }] as AgLineSeriesOptions[],
+    axes: [
+      {
+        type: 'time',
+        position: 'bottom',
+        interval: { step: 'hour' },
+        label: {
+          formatter: (params) => {
+            return params.value.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            })
+          },
+          
+        }
+      }, 
+      {
+        type: 'number',
+        position: 'left'
+      }
+    ]
   }
 
   const fetchData = async () => {

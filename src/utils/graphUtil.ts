@@ -17,11 +17,7 @@ export const getInitialGraphData = (): IData[] => {
 
   for (let i=0; i<=numFiveMin; i++) {
     const candleStick = { 
-      timestamp: new Date(startTime + (i * fiveMin)).toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      }),
+      timestamp: new Date(startTime + (i * fiveMin)),
       price: null
     }
     candleSticks.push(candleStick)
