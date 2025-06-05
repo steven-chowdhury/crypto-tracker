@@ -1,27 +1,57 @@
 import { useState, useEffect } from 'react'
+import * as coinUtil from '../utils/coinUtil'
 
 const useCoins = (symbols: string[]) => {
-  const initialState = symbols.reduce((prev, curr) => {
-    const newMap = new Map(prev)
-    newMap.set(curr, {
-      high: 0,
-      low: 0,
-      volume: 0,
-      symbol: curr,
-      bid: 0,
-      ask: 0,
-      price: 0,
-      timestamp: Date()
-    })
 
-    return newMap
-  }, new Map())
-
-  const [coins, setCoins ] = useState<Map<string, Coin>>(initialState)
-  const [ loading, setLoading ] = useState<boolean>(false)
-  const [ error, setError ] = useState<Error | null>(null)
+  const [ coins, setCoins ] = useState<Map<string, Coin>>(new Map<string, Coin>())
+  const [ loading, setLoading ] = useState<boolean>(true)
+  const [ error, setError ] = useState<unknown | null>(null)
 
   useEffect(() => {
+    let socket: WebSocket | null = null
+
+    const initCoins = async () => {
+      try {
+        await fetchInitialPrices()
+        socket = createWebsocket()
+      } catch (err) {
+        socket?.close()
+        setError(err)
+      }
+    }
+
+    initCoins()
+
+    return () => socket?.close()
+  }, [])
+
+  const fetchInitialPrices = async () => {
+    const coinMap = new Map<string, Coin>()
+
+    const coins = await Promise.all(symbols.map(async symbol => {
+      const res = await fetch(`https://api.binance.us/api/v3/ticker/24hr?symbol=${symbol}`)
+      return res.json()
+    }))
+
+    coins.forEach(coin => {
+      coinMap.set(coin.symbol, {
+        high: coinUtil.formatPrice(coin.highPrice),
+        low: coinUtil.formatPrice(coin.lowPrice),
+        volume: parseFloat(coin.volume),
+        symbol: coin.symbol,
+        bid: coinUtil.formatPrice(coin.bidPrice),
+        ask: coinUtil.formatPrice(coin.askPrice),
+        price: coinUtil.getCurrentPrice(coin.askPrice, coin.bidPrice),
+        timestamp: Date()
+      })
+    })
+
+    setCoins(coinMap)
+
+    setLoading(false)
+  }
+
+  const createWebsocket = (): WebSocket => {
     const streams = symbols
       .map(symbol => `${symbol.toLowerCase()}@ticker`)
       .join('/')
@@ -33,16 +63,14 @@ const useCoins = (symbols: string[]) => {
 
       const data = json.data
 
-      const price = (parseFloat(data.a) + parseFloat(data.b)) / 2
-
       const coin: Coin = {
-        high: formatPrice(data.h),
-        low: formatPrice(data.l),
+        high: coinUtil.formatPrice(data.h),
+        low: coinUtil.formatPrice(data.l),
         volume: parseFloat(data.v),
         symbol: data.s,
-        bid: formatPrice(data.b),
-        ask: formatPrice(data.a),
-        price: formatPrice(price),
+        bid: coinUtil.formatPrice(data.b),
+        ask: coinUtil.formatPrice(data.a),
+        price: coinUtil.getCurrentPrice(data.a, data.b),
         timestamp: data.E
       }
 
@@ -69,11 +97,7 @@ const useCoins = (symbols: string[]) => {
       console.log('Socket disconnected')
     })
 
-    return () => socket.close()
-  }, [])
-
-  const formatPrice = (price: number): number => {
-    return Number(Number(price).toFixed(2))
+    return socket
   }
 
   return {

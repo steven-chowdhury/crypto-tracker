@@ -22,8 +22,12 @@ export default function Home() {
       <h1>Crypto Tracker</h1>
       {loading && <div>Loading...</div>}
       <div className={styles.container}>
-        <CoinGraph coin={coins[selectedIndex]} />
-        <CoinTable coins={coins} onRowSelect={handleRowSelect} />
+        {!loading &&
+          <>
+            <CoinGraph coin={coins[selectedIndex]} />
+            <CoinTable coins={coins} onRowSelect={handleRowSelect} />
+          </>
+        }
       </div>
     </div>
   );

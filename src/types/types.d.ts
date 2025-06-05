@@ -6,7 +6,7 @@ interface Coin {
   bid: number
   ask: number
   price: number
-  timestamp: number
+  timestamp: string
 }
 
 interface IData {
