@@ -20,7 +20,20 @@ const CoinGraph = ({ coin }: CoinGraphProps) => {
       type: 'line', 
       xKey: 'timestamp', 
       yKey: 'price'
-    }] as AgLineSeriesOptions[]
+    }] as AgLineSeriesOptions[],
+    axes: [
+      {
+        type: 'number',
+        position: 'left'
+      },
+      {
+        type: 'category',
+        position: 'bottom',
+        label: {
+          enabled: false
+        }
+      }
+    ]
   }
 
   const fetchData = async () => {
