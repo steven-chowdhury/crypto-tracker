@@ -1,7 +1,7 @@
 .coinTable {
-  min-width: 500px;
+  
+  .coinRow {
+    cursor: pointer;
+  }
 }
 
-.coinRow {
-  cursor: pointer;
-}
